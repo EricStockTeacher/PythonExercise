@@ -1,4 +1,5 @@
 import random
+import sys
 
 def walk(allItems, wizardInventory):
     unequippedItems = [item for item in allItems if item not in wizardInventory]
@@ -19,11 +20,18 @@ def show(wizardInventory):
         print(f"{i}. {item}")
 
 def loadAllItems(allItems):
-    with open("wizard_all_items.txt") as file:
-        for item in file:
-            item = item.replace("\n", "")
-            allItems.append(item)
-
+    try:
+        with open("wizard_all_items.txt") as file:
+            for item in file:
+                item = item.replace("\n", "")
+                allItems.append(item)
+    except FileNotFoundError:
+        print("Could not find wizard_all_items.txt, closing program")
+        sys.exit()
+    except:
+        print("Unexpected error opening wizard_all_items, closing program")
+        sys.exit()
+        
 def loadInventory(wizardInventory):
     with open("inventory.txt") as file:
         for item in file:
@@ -36,12 +44,23 @@ def saveInventory(wizardInventory):
             file.write(f"{item}\n")
 
 def drop(wizardInventory):
-    numberToDrop = int(input("Number: "))
-    if numberToDrop > 0 and numberToDrop <= len(wizardInventory):
-        removedItem = wizardInventory.pop(numberToDrop-1)
-        print(f"You dropped a {removedItem}")
-    else:
-        print("Invalid number for item")
+    if len(wizardInventory) == 0:
+        print("no items to drop")
+        return
+    while True:
+        try:
+            numberToDrop = int(input("Number: "))
+            if numberToDrop > 0 and numberToDrop <= len(wizardInventory):
+                break
+            else:
+                print(f"Number needs to be between 1 and {len(wizardInventory)}") 
+        except ValueError:
+            print("Invalid number please try again")
+        except:
+            print("Unexcepted error, please try again")
+    removedItem = wizardInventory.pop(numberToDrop-1)
+    print(f"You dropped a {removedItem}")
+    
 
 def printMenu():
     print("The Wizard Inventory program")
